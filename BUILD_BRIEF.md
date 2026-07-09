@@ -48,9 +48,9 @@ Keep this compact. Add only sourced facts and assets actually used or deliberate
 ## Asset Manifest
 | File | Source URL | Native size | License/credit | Watermark checked | Intended section | Copy match |
 |---|---|---|---|---|---|---|
-| assets/images/outdoor-battle-ropes.jpg (orig "Nick Cap.jpg") | https://fitnessfinetic.com/success-stories | 1600x1198 | Business's own uploaded client photo, own site asset bucket | yes — none found | Home hero / Training "Outdoor" section | Outdoor training in a park/garden setting — matches |
-| assets/images/outdoor-pullups-sunset.jpg (orig "CL Pull Ups.jpg") | https://fitnessfinetic.com/success-stories | 1600x2133 | Business's own uploaded client photo, own site asset bucket | yes — none found | Training "Outdoor" / gallery strip | Outdoor calisthenics at sunset — matches |
-| assets/images/home-studio-mobility.jpg (orig "RC sideplank-b2db749.jpg") | https://fitnessfinetic.com/success-stories | 1600x1260 | Business's own uploaded client photo, own site asset bucket | yes — none found | Training "Home/Studio" section | Home-based mobility/stability-ball session — matches |
+| assets/images/outdoor-pullups-sunset.jpg (orig "CL Pull Ups.jpg") | https://fitnessfinetic.com/success-stories | 1600x2133 | Business's own uploaded client photo, own site asset bucket | yes — none found | Home hero (since 2026-07-09 fix, see below) / Training "Outdoor" section | Outdoor calisthenics at sunset, dynamic backlit silhouette — matches "outdoor training" copy on both pages |
+| assets/images/home-studio-mobility.jpg (orig "RC sideplank-b2db749.jpg") | https://fitnessfinetic.com/success-stories | 1600x1260 | Business's own uploaded client photo, own site asset bucket | yes — none found | Home "About your trainer" split / Training "Home/Studio" section | Home-based mobility/stability-ball session — matches |
+| assets/images/outdoor-battle-ropes.jpg (orig "Nick Cap.jpg") | https://fitnessfinetic.com/success-stories | 1600x1198 | Business's own uploaded client photo, own site asset bucket | yes — none found | **Unused as of 2026-07-09** — was the Home hero, removed after client feedback (see Fix Log) | n/a — kept on disk, not referenced by any page |
 
 Rejected assets (checked, not used):
 - Homepage "stock" image (`img1.wsimg.com/isteam/stock/98177`) — generic flat-lay stock photo (shoes/towel/water bottle), not this business's own imagery. Rejected.
@@ -58,6 +58,12 @@ Rejected assets (checked, not used):
 - Homepage Getty image (`img1.wsimg.com/isteam/getty/2189219660`) — confirmed via embedded IPTC/EXIF description "Strength and Balance in Downward Dog Pose, Yoga workout in outdoor." as licensed Getty stock. Rejected — third-party stock, not this business's own photography.
 - "Half Inverted colours logo" (the site's current PNG wordmark/running-figure icon) — dated chrome-text clip-art style; deliberately not reused. This demo uses a fresh custom text wordmark as part of the distinct visual identity, not a factual claim, so no sourcing gate applies.
 - No Google Business Profile / social photos were needed as fallback — three genuine, on-site, unused photos were sufficient for the 3-page scope.
+
+### Fix Log — 2026-07-09: Home hero photo swap
+Client feedback (Alex, post-deploy review): the full-bleed Home hero (`outdoor-battle-ropes.jpg`) was "too basic of a photo... not an appealing image" for that large a treatment — flat grey-day lighting, dull suburban courtyard background, low visual drama.
+- Chose path (a) — replace with a genuinely more impressive real photo — rather than (b) shrinking the rope photo to an inset, because a stronger real, already-vetted asset existed in the same 3-photo library: `outdoor-pullups-sunset.jpg` (backlit silhouette, dramatic golden-hour sky and clouds), already used on the Training page's "Outdoor Training" section. No new sourcing needed — same source (`/success-stories`), same watermark/authenticity checks already on file.
+- `outdoor-battle-ropes.jpg` is now unused anywhere on the site. Not force-fit elsewhere (no section it matches better than the two currently in use), consistent with AGENTS.md step 5's "cut the image rather than force a mismatch" guidance. Left on disk, not deleted.
+- The photo is portrait (1600x2133); on mobile widths `object-fit:cover` keeps its full height and crops width instead of height, exposing much more bright sky behind the hero eyebrow/h1 than the old rope photo did at the same position. Rendered-pixel contrast sampling caught this (4.26:1, below the 4.5:1 threshold) before it shipped; fixed by strengthening the hero scrim gradient stops from 62%/66%/90% to 74%/76%/90% (`assets/css/style.css` `.hero-media::after`). Re-verified 5.2-9.4:1 across mobile/tablet/desktop. See QA_REPORT.md for full numbers.
 
 ## Design Notes
 - Palette: deep pine/forest green (`oklch(28% 0.05 155)`) as primary, warm terracotta/amber accent (`oklch(68% 0.16 45)`), warm off-white paper background (`oklch(97% 0.01 90)`), charcoal ink for body text. Distinct from a generic "gym red/black" look to suit a private, personal, boutique studio.

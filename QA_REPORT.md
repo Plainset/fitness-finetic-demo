@@ -104,3 +104,41 @@ Re-fetched `fitnessfinetic.com/about` and `fitnessfinetic.com/` live (independen
 
 ## Verdict
 PASS
+
+## Fix Round 2 — 2026-07-09: Home hero photo (client feedback)
+
+Client feedback (Alex, verbatim, post-deploy): the full-bleed Home hero photo ("someone throwing some rope") was "too basic," "not an appealing image," and not good enough quality for a full-screen treatment.
+
+**Decision: path (a) — replace the hero photo**, not (b) shrink-to-inset. Reason: a genuinely stronger real, already-vetted asset existed in the same 3-photo library sourced from `fitnessfinetic.com/success-stories` — `outdoor-pullups-sunset.jpg` (backlit silhouette action shot, dramatic golden-hour sky/clouds), already in the Asset Manifest and already used on Training's "Outdoor Training" section. No new sourcing, no fabrication — same verified source, same watermark check already on file (see BUILD_BRIEF.md Fix Log).
+
+### Change made
+- `index.html`: hero `<img>` swapped from `outdoor-battle-ropes.jpg` to `outdoor-pullups-sunset.jpg`, alt text updated to describe the sunset pull-up scene. `outdoor-battle-ropes.jpg` is now unused anywhere on the site (kept on disk, not deleted, not force-fit elsewhere).
+- `assets/css/style.css` `.hero-media::after`: hero scrim gradient stops strengthened from 62%/66%/90% to 74%/76%/90% (still monotonically darkening toward the bottom) — needed because the new photo is portrait or (1600x2133); at mobile widths `object-fit:cover` keeps its full height and crops width instead, which exposed more bright sky behind the hero eyebrow/h1 than the old photo did at the same relative position.
+
+### Re-verification evidence
+
+**Contrast — rendered-pixel sampling** (canvas `drawImage` replicating the real `object-fit:cover`/`object-position:center 30%` geometry, plus the actual scrim gradient alpha at each text element's real y-position — same methodology as the original build/review passes, run live via `preview_eval` against the server on port 4223):
+
+| Breakpoint | Element | Ratio | Threshold | Result |
+|---|---|---|---|---|
+| Mobile (375px) — before scrim fix | eyebrow | 4.26:1 | 4.5:1 | **FAIL** (caught before shipping) |
+| Mobile (375px) — after scrim fix | eyebrow | 5.66:1 | 4.5:1 | PASS |
+| Mobile (375px) | h1 | 8.73:1 | 3:1 | PASS |
+| Mobile (375px) | lead | 16.53:1 | 4.5:1 | PASS |
+| Mobile (375px) | ghost button | 15.14:1 | 4.5:1 | PASS |
+| Desktop (1280px) | eyebrow | 9.4:1 | 4.5:1 | PASS |
+| Desktop (1280px) | h1 | 15.7:1 | 3:1 | PASS |
+| Desktop (1280px) | lead | 15.87:1 | 4.5:1 | PASS |
+| Desktop (1280px) | ghost button | 15.88:1 | 4.5:1 | PASS |
+
+The mobile-eyebrow near-miss (4.26:1) was found precisely because this photo swap was re-verified with the same rigor as a first-time build, not assumed safe because the old photo passed — the new photo's brightness distribution differs enough (open sky vs. overcast grey) that the old scrim strength no longer held at every breakpoint. Fixed and re-confirmed above before considering this done.
+
+**Upscale/broken-image audit** (shared methodology, `.hero-media img` + the one other index.html image, all breakpoints, live via `preview_eval`):
+- Desktop (1280px): 2/2 images, 0 violations, 0 broken.
+- Tablet (768px): 2/2 images, 0 violations, 0 broken.
+- Mobile (375px): 2/2 images, 0 violations, 0 broken.
+
+**Visual/subjective check** — screenshots taken at desktop (1280px), tablet (768px), and mobile (375px) via `preview_screenshot` and inspected directly (not just pass/fail metrics): the new hero reads as a dynamic, atmospheric backlit action shot (golden-hour sky, dramatic clouds, clear silhouette mid-pull-up) rather than a flat, ordinary snapshot — a materially more "impressive" full-screen image than the previous battle-rope photo, addressing the client's specific complaint. Text remains clearly legible at all three widths against the strengthened scrim. No console errors on any breakpoint.
+
+### Verdict (Fix Round 2)
+PASS — hero photo replaced with a stronger real, verified asset; the one real regression the swap introduced (mobile eyebrow contrast) was caught and fixed before considering this done.
