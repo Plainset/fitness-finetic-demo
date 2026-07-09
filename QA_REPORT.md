@@ -58,5 +58,49 @@ None outstanding — all three real contrast bugs found above were fixed and re-
 | `.page-header .eyebrow` 2.16–2.71:1 against page-header gradient | Reused `--accent-hero` tint for `.page-header .eyebrow` | 7.79–9.79:1 via canvas-resolved endpoint sampling |
 | Contact-page map iframe failing to load (`net::ERR_ABORTED`) in QA browser | Replaced with a static "Get directions" link-out card, no embed dependency | Confirmed rendering correctly at desktop and mobile widths, no network dependency to fail |
 
+## Independent Review (REVIEW phase, 2026-07-09)
+
+Verified independently against the live rendered pages via `preview_eval`/`preview_inspect`/`preview_screenshot` (server on port 4223, per `.claude/launch.json`), not just read from this report. Treated the above as a map, not proof.
+
+### Contrast audit re-run (shared `.pipeline/qa/contrast-audit.js`, current version on disk)
+- Sanity-checked the script's oklch/color() parsing against this palette's actual computed values first (`--brand`, `--brand-2`, `--accent`, `--accent-dark`, `--accent-deep`, `--accent-hero`, `--paper`, `--ink`, `--ink-soft` all resolved to valid RGB, none fell through as unparsed) — confirms the mid-session oklch-parsing fix mentioned in the build notes works correctly for Fitness Finetic's specific palette. No script changes needed.
+- index.html: `totalChecked: 42`, `violations: 2` (both the documented false-positive pattern — `p.eyebrow` and `a.btn.ghost` measured against the paper background because the hero scrim is a `::after` on the sibling `.hero-media`, not an ancestor of the hero text — same known gap as build time), `needsManualCheck: 4` (both `.btn.accent` instances, `.cta-band` h2/p).
+- training.html: `totalChecked: 65`, `violations: 0`, `needsManualCheck: 6` (page-header eyebrow/h1/lead, cta-band, `.btn.accent`) — matches QA_REPORT.
+- contact.html: `totalChecked: 39`, `violations: 0`, `needsManualCheck: 8` (page-header eyebrow/h1/lead, `.btn.accent`, map-card eyebrow/h3/p/ghost button) — matches QA_REPORT.
+
+### Hero-scrim contrast — re-verified independently (the one the shared script cannot see)
+Wrote a fresh rendered-pixel sampling script (canvas `drawImage`+`getImageData` on the actual hero photo, mapped through the real `object-fit:cover`/`object-position:center 30%` geometry, plus the scrim's actual alpha at each element's real y-position) — independent of the build's own numbers, not just re-reading them.
+- Desktop (1280px): eyebrow 5.72:1, h1 15.51:1, lead 9.59:1, ghost button 10.9:1 — all pass (thresholds 4.5/3/4.5/4.5).
+- Mobile (375px): eyebrow 8.39:1, h1 13.19:1, lead 9.79:1, ghost button 11.73:1 — all pass.
+- Numbers differ slightly from the build's canvas-sampling numbers (single-pixel vs. multi-pixel sampling, slightly different sample point) but land in the same range and pass with the same comfortable margin. Hero-scrim contrast holds at both breakpoints.
+
+### Other two fixed bugs — re-verified independently (not just re-read)
+- Footer `<p>` (`.site-footer p { color: inherit }`): computed `color: oklch(0.97 0.014 90 / 0.82)` over `background: var(--brand-2)` → **11.23:1**. Fix holds.
+- `.btn.accent` gradient (`--accent-dark` → `--accent-deep`) vs. `--paper` text: **6.04:1** / **13.42:1** at the two stops. Fix holds (both figures independently recomputed from live computed styles, not copied from the build's report).
+- Page-header eyebrow (`--accent-hero`) vs. `linear-gradient(155deg in oklch, var(--brand-2), var(--brand) 70%)`: **7.81:1** / **9.79:1** at the two stops (h1/lead even higher, 13.11–16.43:1). Fix holds.
+
+### Upscale/broken-image audit re-run (shared `.pipeline/qa/upscale-audit.js`)
+- index.html: 2/2 images, 0 violations, 0 broken — mobile (375px), tablet (768px), desktop (1280px) all clean.
+- training.html: 2/2 images, 0 violations, 0 broken — mobile, tablet, desktop all clean.
+- contact.html: confirmed 0 `<img>` elements (grep + live DOM count), consistent with the build's report.
+- Cross-checked native pixel dimensions on disk via `sips`: `outdoor-battle-ropes.jpg` 1600×1198, `outdoor-pullups-sunset.jpg` 1600×2133, `home-studio-mobility.jpg` 1600×1260 — all match `BUILD_BRIEF.md`'s Asset Manifest exactly.
+- Grepped all HTML/CSS for `wsimg`/`getty`/`stock`/`placeholder`/`lorem ipsum`/`iframe` — zero matches. No rejected stock/Getty asset and no leftover Maps iframe slipped into the deployed pages.
+
+### Factual claims — verified against the live source site directly (not just BUILD_BRIEF)
+Re-fetched `fitnessfinetic.com/about` and `fitnessfinetic.com/` live (independent of BUILD_BRIEF's transcription) and compared to what's actually printed on the demo pages:
+- Trainer name "Jai", "qualified Personal Trainer since 2012", qualifications "Diet & Nutrition" and "Chromatic Yoga", training locations (health clubs, fitness studios, park, home/workplace) — all confirmed verbatim on the live `/about` page and matched on index.html/training.html.
+- All 3 pricing packages confirmed verbatim on the live homepage: Start Up £120 / 3×60min / valid 21 days / health & lifestyle consultation; Personal Training £480 / 12×60min; Yoga Pass £190 / 10 sessions (30 or 60 min) / valid 12 weeks. Demo site copy matches exactly, no rounding or embellishment.
+- No phone number, no social links, no testimonial quotes, no star ratings/review counts, no named parks, no trainer surname/credential numbers anywhere on the demo site — consistent with the `Do Not Claim` table.
+
+### Mobile layout — re-verified interactively
+- Nav toggle: clicking `.nav-toggle` correctly sets `aria-expanded="true"`/`data-nav-open="true"` and the dropdown (`max-height` transition) renders as a full-width overlay **above** the hero photo once the transition completes — confirmed via screenshot. (A screenshot taken mid-transition initially looked like the dropdown was rendering behind the hero; re-shooting after the 0.3s `max-height` transition settled showed it renders correctly on top — not a real bug, just transition timing in the first capture.)
+- Training page pricing table: confirmed via `scrollWidth` (640px) > `clientWidth` (345px) inside `.scroll-x` with `overflow-x:auto` — scrolls horizontally within its own container rather than overflowing the page, as claimed.
+- Contact page FAQ `<details>/<summary>` toggles open correctly.
+- Contact page "Get directions" link: confirmed `href="https://www.google.com/maps/search/?api=1&query=57+Woodlands%2C+London+NW11+9QS"` with `target="_blank" rel="noopener"` — no embed dependency, consistent with BUILD_BRIEF's note about dropping the broken Maps iframe.
+- No console errors, no failed network requests on any of the 3 pages.
+
+### Review verdict
+**PASS.** No blocking issues found. All three build-time bug fixes (footer text color, `.btn.accent` gradient/text pairing, eyebrow-on-gradient/hero-photo color) hold under independent re-verification, including the hero-scrim case the shared script can't see. The shared `contrast-audit.js`'s oklch-parsing patch works correctly for this business's palette — no script fix needed here. No fabricated facts, no stock/Getty/broken images, no upscale violations at any breakpoint, mobile layout and interactive elements (nav, FAQ disclosure, directions link) all function correctly.
+
 ## Verdict
 PASS
