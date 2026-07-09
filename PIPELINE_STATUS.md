@@ -3,7 +3,7 @@
 Operational handoff only. `LEADS.md` and `OUTREACH_LOG.md` remain the source of truth.
 
 - Current phase: FIX+DEPLOY complete (Fix Round 2: hero photo) — live
-- Last trusted commit: (pending this round's commit, see below) — will be pushed to `main` on `Plainset/fitness-finetic-demo`. Prior trusted commit: `2356763` (Record REVIEW phase pass).
+- Last trusted commit: `29e1075` (Fix: replace low-quality Home hero photo per client feedback) — pushed to `main` on `Plainset/fitness-finetic-demo`. Prior trusted commit: `2356763` (Record REVIEW phase pass).
 - Known untrusted state: none — Fix Round 2 re-verified contrast (rendered-pixel sampling at mobile/tablet/desktop, live via `preview_eval`) and the upscale/broken-image audit after swapping the Home hero photo, catching and fixing one real regression (mobile hero-eyebrow contrast dropped to 4.26:1 after the swap; fixed to 5.66:1+ by strengthening the hero scrim). See QA_REPORT.md's "Fix Round 2" section for full evidence.
 - Next exact action: none — fix verified and deployed. Outreach still not started (unchanged from before this fix round).
 - Deploy URL: https://plainset.github.io/fitness-finetic-demo/ — GitHub repo `Plainset/fitness-finetic-demo`, Pages serving from `main` branch root. Confirmed live 2026-07-09 after Fix Round 2 push, reflecting the new hero photo; `/training.html` and `/contact.html` unaffected and still load correctly.
