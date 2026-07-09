@@ -1,0 +1,862 @@
+/* ==========================================================================
+   Fitness Finetic — demo redesign
+   Distinct identity: private, boutique personal-training studio.
+   Deep pine green + warm terracotta accent on warm paper, serif display type.
+   ========================================================================== */
+
+@view-transition {
+  navigation: auto;
+}
+
+:root {
+  --brand: oklch(28% 0.055 155);
+  --brand-2: oklch(20% 0.045 155);
+  --brand-tint: color-mix(in oklch, var(--brand) 22%, white);
+  --accent: oklch(68% 0.16 45);
+  --accent-dark: color-mix(in oklch, var(--accent) 72%, black);
+  --accent-deep: color-mix(in oklch, var(--accent) 42%, black);
+  --accent-tint: color-mix(in oklch, var(--accent) 18%, white);
+  --accent-hero: color-mix(in oklch, var(--accent) 58%, white);
+  --paper: oklch(97% 0.014 90);
+  --paper-2: oklch(93% 0.02 88);
+  --ink: oklch(22% 0.02 155);
+  --ink-soft: oklch(38% 0.02 155);
+  --line: color-mix(in oklch, var(--ink) 14%, transparent);
+
+  --font-display: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  --container: min(72rem, 92vw);
+  --radius: 0.9rem;
+  --shadow-soft: 0 1.2rem 2.4rem -1.2rem color-mix(in oklch, var(--brand-2) 55%, transparent);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  line-height: 1.15;
+  margin: 0 0 0.5em;
+  color: var(--brand-2);
+  font-weight: 600;
+}
+
+h1 { font-size: clamp(2.4rem, 5vw + 1rem, 4rem); }
+h2 { font-size: clamp(1.8rem, 3vw + 1rem, 2.6rem); }
+h3 { font-size: clamp(1.25rem, 1.4vw + 1rem, 1.55rem); }
+
+p {
+  margin: 0 0 1em;
+  color: var(--ink-soft);
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-dark);
+}
+
+.eyebrow::before {
+  content: "";
+  width: 1.6em;
+  height: 2px;
+  background: var(--accent);
+  display: inline-block;
+}
+
+.container {
+  width: var(--container);
+  margin-inline: auto;
+}
+
+/* Thin custom scrollbars on internally-scrolling elements */
+.scroll-x {
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--brand-tint) transparent;
+}
+.scroll-x::-webkit-scrollbar {
+  height: 8px;
+}
+.scroll-x::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scroll-x::-webkit-scrollbar-thumb {
+  background: color-mix(in oklch, var(--brand) 45%, transparent);
+  border-radius: 999px;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  --btn-bg: var(--brand);
+  --btn-fg: var(--paper);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.85em 1.5em;
+  border-radius: 999px;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: 1px solid transparent;
+  isolation: isolate;
+}
+
+.btn-wrap {
+  display: inline-block;
+  transition: transform 0.25s ease;
+}
+.btn-wrap:hover {
+  transform: translateY(-2px);
+}
+.btn-wrap:hover .btn {
+  box-shadow: var(--shadow-soft);
+}
+
+.btn.accent {
+  /* Both gradient stops are kept dark enough (relative luminance well under
+     ~0.16) that the light --paper text clears 4.5:1 across the whole
+     button, not just at one end -- a light-orange/dark-text pairing here
+     measured as low as 2.86:1 at the accent-dark stop and 2.8:1 at the
+     accent stop (checked via rendered-pixel luminance sampling). */
+  --btn-bg: linear-gradient(120deg in oklch, var(--accent-dark), var(--accent-deep));
+  --btn-fg: var(--paper);
+}
+
+.btn.ghost {
+  --btn-bg: transparent;
+  --btn-fg: var(--paper);
+  border-color: color-mix(in oklch, var(--paper) 55%, transparent);
+}
+
+.btn.ghost.dark {
+  --btn-fg: var(--brand-2);
+  border-color: color-mix(in oklch, var(--brand-2) 35%, transparent);
+}
+
+/* ---------- Header ---------- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: color-mix(in oklch, var(--paper) 92%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+
+.site-header .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: 1rem;
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--brand-2);
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+}
+
+.wordmark small {
+  font-family: var(--font-body);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent-dark);
+}
+
+.nav-toggle {
+  display: none;
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 0.6rem;
+  padding: 0.5rem 0.7rem;
+  cursor: pointer;
+}
+
+.nav-toggle span,
+.nav-toggle span::before,
+.nav-toggle span::after {
+  content: "";
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--brand-2);
+  position: relative;
+  transition: transform 0.2s ease;
+}
+.nav-toggle span::before { position: absolute; top: -7px; }
+.nav-toggle span::after { position: absolute; top: 7px; }
+
+.primary-nav ul {
+  display: flex;
+  gap: 2.2rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.primary-nav a {
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+  position: relative;
+  padding-bottom: 0.2em;
+}
+
+.primary-nav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 100%;
+  bottom: 0;
+  height: 2px;
+  background: var(--accent);
+  transition: right 0.25s ease;
+}
+
+.primary-nav a:hover::after,
+.primary-nav a[aria-current="page"]::after {
+  right: 0;
+}
+
+.primary-nav a[aria-current="page"] {
+  color: var(--brand-2);
+}
+
+@media (max-width: 780px) {
+  .nav-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .primary-nav {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  .primary-nav ul {
+    flex-direction: column;
+    gap: 0;
+    padding: 0.5rem var(--edge, 4vw) 1.2rem;
+  }
+
+  .primary-nav li {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .primary-nav a {
+    display: block;
+    padding: 0.9rem 0;
+  }
+
+  .site-header[data-nav-open="true"] .primary-nav {
+    max-height: 24rem;
+  }
+
+  .site-header[data-nav-open="true"] .nav-toggle span {
+    background: transparent;
+  }
+  .site-header[data-nav-open="true"] .nav-toggle span::before {
+    transform: rotate(45deg);
+    top: 0;
+  }
+  .site-header[data-nav-open="true"] .nav-toggle span::after {
+    transform: rotate(-45deg);
+    top: 0;
+  }
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  position: relative;
+  min-height: 88vh;
+  display: flex;
+  align-items: flex-end;
+  color: var(--paper);
+  overflow: hidden;
+}
+
+.hero-media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.hero-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+}
+
+.hero-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* Monotonically darkening toward the bottom (where the heading/CTAs
+     sit) -- an earlier version dipped to 40% around the eyebrow's height,
+     which measured as low as ~2.75:1 against the photo there. Checked via
+     rendered-pixel luminance sampling at each text element's actual
+     position, since this scrim is a sibling pseudo-element and the
+     shared contrast-audit script cannot see across that boundary. */
+  background: linear-gradient(180deg in oklch,
+    color-mix(in oklch, var(--brand-2) 62%, transparent) 0%,
+    color-mix(in oklch, var(--brand-2) 66%, transparent) 35%,
+    color-mix(in oklch, var(--brand-2) 90%, transparent) 100%);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  padding-block: 4rem 4.5rem;
+  max-width: 42rem;
+}
+
+.hero-content .eyebrow {
+  /* Lightened relative to the base --accent-dark eyebrow color: at 40%
+     scrim opacity (the previous weak point) plain --accent measured
+     ~2.8:1 against the photo -- this tint plus the strengthened scrim
+     above clears 4.5:1 with margin. */
+  color: var(--accent-hero);
+  text-shadow: 0 1px 10px color-mix(in oklch, var(--brand-2) 85%, transparent);
+}
+
+.hero-content .eyebrow::before {
+  background: var(--accent-hero);
+}
+
+.hero h1 {
+  color: var(--paper);
+  text-shadow: 0 2px 18px color-mix(in oklch, var(--brand-2) 70%, transparent);
+}
+
+.hero p.lead {
+  color: color-mix(in oklch, var(--paper) 92%, transparent);
+  font-size: 1.15rem;
+  text-shadow: 0 1px 10px color-mix(in oklch, var(--brand-2) 60%, transparent);
+  max-width: 34rem;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1.6rem;
+}
+
+/* small page header for interior pages */
+.page-header {
+  background: linear-gradient(155deg in oklch, var(--brand-2), var(--brand) 70%);
+  color: var(--paper);
+  padding-block: 5rem 4rem;
+}
+
+.page-header h1 {
+  color: var(--paper);
+}
+
+.page-header p.lead {
+  color: color-mix(in oklch, var(--paper) 88%, transparent);
+  max-width: 40rem;
+  font-size: 1.1rem;
+}
+
+/* Base .eyebrow's --accent-dark reads fine on the light --paper sections
+   but measured only ~2.2-2.7:1 against this dark brand gradient --
+   checked via rendered-pixel luminance sampling of both gradient stops. */
+.page-header .eyebrow {
+  color: var(--accent-hero);
+}
+
+/* ---------- Sections ---------- */
+section {
+  padding-block: clamp(3.5rem, 6vw, 6rem);
+}
+
+.section-head {
+  max-width: 40rem;
+  margin-bottom: 2.6rem;
+}
+
+.alt-bg {
+  background: var(--paper-2);
+}
+
+.brand-bg {
+  background: var(--brand-2);
+  color: var(--paper);
+}
+
+.brand-bg h2,
+.brand-bg h3 {
+  color: var(--paper);
+}
+
+.brand-bg p {
+  color: color-mix(in oklch, var(--paper) 85%, transparent);
+}
+
+/* ---------- Fact strip ---------- */
+.fact-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.fact {
+  background: var(--paper);
+  padding: 1.6rem 1.4rem;
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-row: span 2;
+  gap: 0.3rem;
+}
+
+.fact strong {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  color: var(--brand-2);
+}
+
+.fact span {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
+@media (max-width: 780px) {
+  .fact-strip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ---------- Card grid ---------- */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.75rem;
+}
+
+.card {
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-row: span 4;
+  gap: 0;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 2rem 1.75rem;
+  box-shadow: 0 0.6rem 1.6rem -1.1rem color-mix(in oklch, var(--ink) 30%, transparent);
+}
+
+.card .card-icon {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.7rem;
+  background: color-mix(in oklch, var(--accent) 20%, var(--paper));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.1rem;
+  color: var(--accent-dark);
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+.card h3 {
+  margin-bottom: 0.5rem;
+}
+
+.card p {
+  margin-bottom: 1rem;
+}
+
+.card .card-link {
+  align-self: end;
+  font-weight: 700;
+  color: var(--accent-dark);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 900px) {
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Split (image + text) ---------- */
+.split {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: clamp(2rem, 4vw, 4rem);
+  align-items: center;
+}
+
+.split.reverse .split-media {
+  order: 2;
+}
+
+.split-media {
+  aspect-ratio: 4 / 5;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+}
+
+.split-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (max-width: 860px) {
+  .split {
+    grid-template-columns: 1fr;
+  }
+  .split.reverse .split-media {
+    order: 0;
+  }
+}
+
+/* ---------- Pull quote / about ---------- */
+.pull-quote {
+  border-left: 3px solid var(--accent);
+  padding-left: 1.4rem;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  color: var(--brand-2);
+  font-style: italic;
+}
+
+.trainer-box {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 2rem;
+}
+
+.trainer-box ul {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.trainer-box li {
+  display: flex;
+  gap: 0.6rem;
+  align-items: baseline;
+  color: var(--ink-soft);
+}
+
+.trainer-box li::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex: none;
+  transform: translateY(-2px);
+}
+
+/* ---------- Pricing table ---------- */
+.pricing-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 640px;
+  background: var(--paper);
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+
+.pricing-table th,
+.pricing-table td {
+  padding: 1.1rem 1.4rem;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+}
+
+.pricing-table thead th {
+  background: var(--brand-2);
+  color: var(--paper);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.pricing-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.pricing-table .price {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: var(--accent-dark);
+  white-space: nowrap;
+}
+
+.pricing-table td small,
+.pricing-table td .fine {
+  display: block;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+  margin-top: 0.2rem;
+}
+
+/* ---------- CTA band ---------- */
+.cta-band {
+  background: linear-gradient(135deg in oklch, var(--brand-2), var(--brand));
+  color: var(--paper);
+  border-radius: var(--radius);
+  padding: clamp(2.2rem, 4vw, 3.5rem);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cta-band h2 {
+  color: var(--paper);
+  margin-bottom: 0.4rem;
+}
+
+.cta-band p {
+  color: color-mix(in oklch, var(--paper) 85%, transparent);
+  margin: 0;
+}
+
+/* ---------- Contact page ---------- */
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5rem;
+}
+
+.contact-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 2.2rem;
+}
+
+.contact-card dl {
+  margin: 1.4rem 0 0;
+  display: grid;
+  gap: 1.1rem;
+}
+
+.contact-card dt {
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-dark);
+  font-weight: 700;
+}
+
+.contact-card dd {
+  margin: 0.2rem 0 0;
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+
+.map-card {
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  aspect-ratio: 1 / 1;
+  background:
+    linear-gradient(155deg in oklch, var(--brand-2), var(--brand) 75%);
+  display: flex;
+  align-items: flex-end;
+  position: relative;
+}
+
+.map-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 30%, color-mix(in oklch, var(--paper) 10%, transparent) 0, transparent 45%),
+    radial-gradient(circle at 80% 70%, color-mix(in oklch, var(--accent) 22%, transparent) 0, transparent 50%);
+}
+
+.map-card-body {
+  position: relative;
+  z-index: 1;
+  padding: 2rem;
+  color: var(--paper);
+}
+
+.map-card-body h3,
+.map-card-body p {
+  color: var(--paper);
+}
+
+.map-card-body .eyebrow {
+  color: var(--accent-hero);
+}
+
+@media (max-width: 860px) {
+  .contact-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Details/FAQ-like note ---------- */
+details.note {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1rem 1.3rem;
+}
+
+details.note summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--brand-2);
+}
+
+details.note[open] summary {
+  margin-bottom: 0.6rem;
+}
+
+/* ---------- Footer ---------- */
+.site-footer {
+  background: var(--brand-2);
+  color: color-mix(in oklch, var(--paper) 82%, transparent);
+  padding-block: 3rem 2rem;
+  font-size: 0.9rem;
+}
+
+.footer-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.5rem;
+  justify-content: space-between;
+  border-bottom: 1px solid color-mix(in oklch, var(--paper) 18%, transparent);
+  padding-bottom: 2rem;
+  margin-bottom: 1.4rem;
+}
+
+.footer-grid .wordmark {
+  color: var(--paper);
+}
+
+.footer-grid .wordmark small {
+  color: var(--accent);
+}
+
+.footer-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.footer-nav a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* The global `p { color: var(--ink-soft) }` rule (tuned for light
+   backgrounds) otherwise wins over the dark .site-footer's own inherited
+   light color for any bare <p> inside it -- measured contrast ratio 1.81
+   against the dark footer background before this override. */
+.site-footer p {
+  color: inherit;
+}
+
+.footer-fine {
+  opacity: 0.7;
+}
+
+/* ---------- Reveal-on-scroll ---------- */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .btn-wrap:hover {
+    transform: none;
+  }
+}
+
+/* Utility */
+.mt-lg { margin-top: clamp(2.5rem, 5vw, 4rem); }
+.center { text-align: center; margin-inline: auto; }
